@@ -1,0 +1,12 @@
+/* Put your CSS in here! */
+
+/* .input{
+    width: 30%;
+    height: 40px
+} */
+
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
