@@ -10,19 +10,35 @@ const Login = () => {
     const navigate = useNavigate();
 
     const [showPassword, setShowPassword] = useState(false)
+    
+    const { register, handleSubmit, formState: { errors }, reset } = useForm({
+        defaultValues: {
+            email: '',
+            password: ''
+        }
+    });
 
-    const { register,
-        handleSubmit,
-        watch,
-        formState: { errors }
-    } = useForm();
+  
+    const formSubmit = async (data) => {
+        try{
+            const response = await fetch("http://localhost:8080/api/login", {
+                method:'POST',
+                headers:{                           
+                    'Content-Type': 'application/json'
+                },                                         
+                body: JSON.stringify(data)})
+                const user = await response.json()
+                reset()
 
-    const [show, setShow] = useState(false)
-    const formData = watch()
-
-    const formSubmit = (data) => {
+                navigate(`/${user.firstName}`)
+    
+            
+        }catch(e){
+            console.error("Error registering")
+        }
         console.log(data)
-        setShow(true);
+    
+
 
     }
 
@@ -31,7 +47,8 @@ const Login = () => {
     }
 
     return (
-        <form onSubmit={handleSubmit(formSubmit)}>
+        <form onSubmit={handleSubmit(formSubmit)}>  
+        {/* data comes from here. built in  */}
         <div className="flex flex-col items-center pt-20 h-screen">
             <div className="border-4 border-[#185519] rounded-3xl p-20 w-1/2">
                 <div className="items-left">
@@ -40,8 +57,8 @@ const Login = () => {
                     <fieldset className="border p-1 rounded-md border-black bg-white mb-10">
                         <legend className="text-xl">Email*</legend>
                         <input className="w-96 h-12 pl-5 focus:outline-none" type="email"
-                            {...register("firstName", {required: true})}
-                            placeholder="First Name" />
+                            {...register("email", {required: true})}
+                        />
                     </fieldset>
 
                     <fieldset className="border p-1 rounded-md border-black bg-white mb-5 relative">
@@ -50,6 +67,7 @@ const Login = () => {
                         <input
                             className="w-60 h-12 pl-5 focus:outline-none"
                             type={showPassword ? "text" : "password"}
+                            {...register("password", {reguired:true})}
                         />
 
                         {/* top-1/2 => the element's top is positioned at the halfway point of the container -in this case <input/>.

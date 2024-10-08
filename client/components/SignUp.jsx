@@ -1,5 +1,6 @@
 import { useForm } from "react-hook-form";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const SignUp = () => {
 
@@ -13,23 +14,23 @@ const SignUp = () => {
         }
     });
 
-    const [show, setShow] = useState(false)
+    const navigate = useNavigate();
 
     const formSubmit = async (data) => {
-        try{
+        try {
             await fetch("http://localhost:8080/api/signUp", {
-                method:'POST',
-                headers:{                           //additional metadata to send with your request. 
+                method: 'POST',
+                headers: {                           //additional metadata to send with your request. 
                     'Content-Type': 'application/json'   //content-type tells the server what type of data is being sent in the body of the request! We arere specifying the data is in JSON format.
                 },                                         //Without this header, the server might not know how to interpret the request body, leading to errors in processing.
                 body: JSON.stringify(data) //converts data object to JSON string!! 
             })
-            
-        }catch(e){
+
+        } catch (e) {
             console.error("Error registering")
         }
-        console.log(data)
-        setShow(true);
+        navigate('/logIn')
+
 
     }
 

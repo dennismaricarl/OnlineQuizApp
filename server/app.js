@@ -39,14 +39,23 @@ app.use((error, req, res, next) => {
   });
 });
 
+//Middleware to attach to db connection 
+app.use(async (req, res, next)=> {
+  try{
+    req.db = await getDb(); // add db property to existing request object
+    next();
+  }catch(error){
+    console.error("Database connection error:", error)
+    res.status(500).send({error: "Database connection failed!"})
+  }
+})
+
 
 
 //COLLECTIONS 
 app.get('/api/css', async (req, res) => {
   try {
-
-    const db = await getDb();
-    let request = await db.collection("CSS");
+    let request = await req.db.collection("CSS");
     const css = await request.find({}).toArray();
     res.status(200).json(css);
 
@@ -58,8 +67,7 @@ app.get('/api/css', async (req, res) => {
 
 app.get('/api/html', async (req, res) => {
   try {
-    const db = await getDb();
-    let request = await db.collection("HTML");
+    let request = await req.db.collection("HTML");
     const html = await request.find({}).toArray();
     res.status(200).json(html);
 
@@ -72,8 +80,7 @@ app.get('/api/html', async (req, res) => {
 
 app.get('/api/javascript', async (req, res) => {
   try {
-    const db = await getDb();
-    let request = await db.collection("JavaScript");
+    let request = await req.db.collection("JavaScript");
     const javascript = await request.find({}).toArray();
     res.status(200).json(javascript);
 
@@ -86,8 +93,7 @@ app.get('/api/javascript', async (req, res) => {
 
 app.get('/api/AdvancedJS', async (req, res) => {
   try {
-    const db = await getDb();
-    let request = await db.collection("AdvancedJS");
+    let request = await req.db.collection("AdvancedJS");
     const advancedjs = await request.find({}).toArray();
     res.status(200).json(advancedjs);
 
@@ -99,8 +105,7 @@ app.get('/api/AdvancedJS', async (req, res) => {
 
 app.get('/api/WomenInCS', async (req, res) => {
   try {
-    const db = await getDb();
-    let request = await db.collection("WomenInCS");
+    let request = await req.db.collection("WomenInCS");
     const womenincs = await request.find({}).toArray();
     res.status(200).json(womenincs);
 
@@ -113,8 +118,7 @@ app.get('/api/WomenInCS', async (req, res) => {
 
 app.get('/api/Git', async (req, res) => {
   try {
-    const db = await getDb();
-    let request = await db.collection("Git");
+    let request = await req.db.collection("Git");
     const git = await request.find({}).toArray();
     res.status(200).json(git);
 
@@ -141,11 +145,9 @@ app.get('/api/Git', async (req, res) => {
 app.post('/api/makeAquiz', async (req, res) => {
   let category = req.body.category;
   let data = req.body.data;
-
-  const db = await getDb();
   console.log('category----', category)
   console.log('data----', data)
-  let collection = await db.collection(category)
+  let collection = await req.db.collection(category)
   let result = await collection.insertMany(data);
   res.send(result).status(204);
 })
@@ -153,9 +155,7 @@ app.post('/api/makeAquiz', async (req, res) => {
 app.post('/api/signUp', async (req, res) => {
   let data = req.body; // { username: 'newuser', password: 'newpass' }
   console.log(data)
-
-  const db = await getDb();
-  let collection = await db.collection('userData');
+  let collection = await req.db.collection('userData');
 
   try {
     // Check if the user already exists
@@ -176,17 +176,20 @@ app.post('/api/signUp', async (req, res) => {
 });
 
 
-app.get('/api/login', async (req,res) => {
+app.post('/api/login', async (req,res) => {
   try{
-    const db = await getDb();
     const details = req.body  //this is the data literally- email & password  - "client data"
+    console.log(details)
 
-    let request = await db.collection("userData")   //were looking for the "userData" collection in mongoDB database
-    const user = await request.findOne({ Email: details.Email }) //find the user email from the dtabase 
+    let request = await req.db.collection("userData")   //were looking for the "userData" collection in mongoDB database
+    const user = await request.findOne({ email: details.email }) //find the user email from the dtabase 
+ 
+
 
     if(user){
-      if(request.password === user.password){
-        res.status(200).json({message: 'successfully logged in'})
+      if(details.password === user.password){
+        console.log("line192",user)
+        res.json({message: 'successfully logged in', firstName: user.firstName}  )
       }else{
         res.json({message:'Incorrect Password!'})
       }
