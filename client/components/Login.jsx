@@ -11,7 +11,7 @@ const Login = () => {
 
     const [showPassword, setShowPassword] = useState(false)
     
-    const { register, handleSubmit, formState: { errors }, reset } = useForm({
+    const { register, handleSubmit, formState: { errors }, reset } = useForm({       ///react-hook-form //destructure functions and states!!! 
         defaultValues: {
             email: '',
             password: ''
@@ -28,7 +28,7 @@ const Login = () => {
                 },                                         
                 body: JSON.stringify(data)})
                 const user = await response.json()
-                reset()
+                reset() //reset the form 
 
                 navigate(`/${user.firstName}`)
     

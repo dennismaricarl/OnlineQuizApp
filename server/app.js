@@ -2,7 +2,7 @@ const path = require("path");
 const express = require("express");
 const morgan = require("morgan");
 const app = express();
-const { getDb } = require('./db/client');
+const { getDb } = require('./db/client'); //okay! Here's my db connection!!
 
 
 // Logging middleware
@@ -19,25 +19,8 @@ app.get("/test", (req, res, next) => {
   res.send("Test route");
 });
 
-// app.get('/', (req, res, next) => {
-//   res.sendFile(path.join(__dirname, '../dist/index.html'));
-// })
+// ROUTERS BELOW 
 
-// TODO: Add your routers here
-
-// Error handling middleware
-app.use((error, req, res, next) => {
-  console.error('SERVER ERROR: ', error);
-  if (res.statusCode < 400) {
-    res.status(500);
-  }
-  res.send({
-    error: error.message,
-    name: error.name,
-    message: error.message,
-    table: error.table,
-  });
-});
 
 //Middleware to attach to db connection 
 app.use(async (req, res, next)=> {
@@ -55,7 +38,7 @@ app.use(async (req, res, next)=> {
 //COLLECTIONS 
 app.get('/api/css', async (req, res) => {
   try {
-    let request = await req.db.collection("CSS");
+    let request = await req.db.collection("CSS");      //-->req.db here so we dont have to keep calling the database. 
     const css = await request.find({}).toArray();
     res.status(200).json(css);
 
@@ -219,6 +202,20 @@ app.post('/api/login', async (req,res) => {
 //your React application's index.html file.
 //React Router then takes over from there, interpreting the route and rendering the appropriate component on the client side.
 
+
+// Error handling middleware
+app.use((error, req, res, next) => {
+  console.error('SERVER ERROR: ', error);
+  if (res.statusCode < 400) {
+    res.status(500);
+  }
+  res.send({
+    error: error.message,
+    name: error.name,
+    message: error.message,
+    table: error.table,
+  });
+});
 
 // * Handles all URLs (wildcard).
 app.get('*', (req, res) => {
