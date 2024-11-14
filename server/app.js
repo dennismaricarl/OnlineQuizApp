@@ -4,6 +4,7 @@ const morgan = require("morgan");
 const app = express();
 const { getDb } = require('./db/client'); //okay! Here's my db connection!!
 
+app.use("/auth",require('./auth'));
 
 // Logging middleware
 app.use(morgan("dev"));
@@ -135,55 +136,55 @@ app.post('/api/makeAquiz', async (req, res) => {
   res.send(result).status(204);
 })
 
-app.post('/api/signUp', async (req, res) => {
-  let data = req.body; // { username: 'newuser', password: 'newpass' }
-  console.log(data)
-  let collection = await req.db.collection('userData');
+// app.post('/api/signUp', async (req, res) => {
+//   let data = req.body; // { username: 'newuser', password: 'newpass' }
+//   console.log(data)
+//   let collection = await req.db.collection('userData');
 
-  try {
-    // Check if the user already exists
-    let existingUser = await collection.findOne({ Email: data.email });
-    console.log(existingUser)
-    console.log(data.email)
+//   try {
+//     // Check if the user already exists
+//     let existingUser = await collection.findOne({ Email: data.email });
+//     console.log(existingUser)
+//     console.log(data.email)
 
-    if (existingUser) {
-      res.status(409).send({ message: "Username already exists" });
-    } else {
-      let result = await collection.insertOne(data);
-      res.status(201).send({ message: "User registered successfully", id: result.insertedId });
-    }
-  } catch (error) {
-    res.status(500).send({ message: "Internal Server Error", error });
-  }
+//     if (existingUser) {
+//       res.status(409).send({ message: "Username already exists" });
+//     } else {
+//       let result = await collection.insertOne(data);
+//       res.status(201).send({ message: "User registered successfully", id: result.insertedId });
+//     }
+//   } catch (error) {
+//     res.status(500).send({ message: "Internal Server Error", error });
+//   }
 
-});
+// });
 
 
-app.post('/api/login', async (req,res) => {
-  try{
-    const details = req.body  //this is the data literally- email & password  - "client data"
-    console.log(details)
+// app.post('/api/login', async (req,res) => {
+//   try{
+//     const details = req.body  //this is the data literally- email & password  - "client data"
+//     console.log(details)
 
-    let request = await req.db.collection("userData")   //were looking for the "userData" collection in mongoDB database
-    const user = await request.findOne({ email: details.email }) //find the user email from the dtabase 
+//     let request = await req.db.collection("userData")   //were looking for the "userData" collection in mongoDB database
+//     const user = await request.findOne({ email: details.email }) //find the user email from the dtabase 
  
 
 
-    if(user){
-      if(details.password === user.password){
-        console.log("line192",user)
-        res.json({message: 'successfully logged in', firstName: user.firstName}  )
-      }else{
-        res.json({message:'Incorrect Password!'})
-      }
-    }
+//     if(user){
+//       if(details.password === user.password){
+//         console.log("line192",user)
+//         res.json({message: 'successfully logged in', firstName: user.firstName}  )
+//       }else{
+//         res.json({message:'Incorrect Password!'})
+//       }
+//     }
     
-  }catch(error){
-    console.error(error)
-    res.status(500).json({error: 'could not find username'})
-  }
+//   }catch(error){
+//     console.error(error)
+//     res.status(500).json({error: 'could not find username'})
+//   }
  
-})
+// })
 
 
 
